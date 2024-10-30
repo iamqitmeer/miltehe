@@ -1,8 +1,8 @@
 "use client"
-import  React, { useState } from "react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-// import { useMediaQuery } from "@/hooks/use-media-query";
+// import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
