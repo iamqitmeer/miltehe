@@ -1,67 +1,82 @@
 import connectDB from "@/lib/db/dbConnect";
-import { EventModals } from "@/lib/modals/EventsModal";
+import Event from "@/lib/models/Event";
+import Category from "@/lib/models/Category";
+import SubCategory from "@/lib/models/SubCategory";
 
-export async function GET(request) {
+export async function GET(req) {
   await connectDB();
 
-  let events = await EventModals.find();
-
-  return Response.json(
-    {
-      events,
-      message: "Event Fetch Succesfully",
-    },
-    {
-      status: 200,
-    }
-  );
+  try {
+    const events = await Event.find()
+      .populate("category", "name")
+      .populate("subCategory", "name")
+      .populate("creator", "name email");
+    return Response.json({ events }, { status: 200 });
+  } catch (error) {
+    return Response.json({ message: "Failed to fetch events", error }, { status: 500 });
+  }
 }
 
-export async function POST(request) {
+export async function POST(req) {
+  await connectDB();
+
   try {
-    // Connect to the database
-    await connectDB();
+    const {
+      name,
+      description,
+      startDate,
+      endDate,
+      location,
+      speaker,
+      capacity,
+      tags,
+      category,
+      subCategory,
+      eventImage,
+    } = await req.json();
 
-    // Get the request body
-    const body = await request.json();
-
-    const { name, description, startDate, endDate, location, eventImage } =
-      body;
-
-    // Validate incoming data
+    // Validate required fields
     if (
       !name ||
       !description ||
       !startDate ||
       !endDate ||
       !location ||
+      !speaker ||
+      !capacity ||
+      !category ||
+      !subCategory ||
       !eventImage
     ) {
-      return new Response(
-        JSON.stringify({ message: "All fields are required" }),
-        { status: 400 }
-      );
+      return Response.json({ message: "All fields are required" }, { status: 400 });
     }
 
-    // Create a new event
-    const newEvent = new EventModals({
+    // Validate category and subCategory
+    const categoryExists = await Category.findById(category);
+    const subCategoryExists = await SubCategory.findById(subCategory);
+
+    if (!categoryExists || !subCategoryExists) {
+      return Response.json({ message: "Invalid category or sub-category" }, { status: 400 });
+    }
+
+    // Create new event
+    const newEvent = new Event({
       name,
       description,
       startDate,
       endDate,
       location,
+      speaker,
+      capacity,
+      tags,
+      category,
+      subCategory,
       eventImage,
     });
 
-    // Save the event to the database
     const savedEvent = await newEvent.save();
-
-    // Return the saved event as a response
-    return new Response.json({ events: savedEvent }, { status: 201 });
-  } catch (err) {
-    console.error("Error creating event:", err);
-    return new Response(JSON.stringify({ message: "Failed to create event" }), {
-      status: 500,
-    });
+    return Response.json({ event: savedEvent }, { status: 201 });
+  } catch (error) {
+    return Response.json({ message: "Failed to create event", error }, { status: 500 });
   }
 }

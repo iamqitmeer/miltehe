@@ -13,6 +13,8 @@ import {
   Sun,
   Moon,
   Calendar,
+  PowerOffIcon,
+  User2Icon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,15 +190,21 @@ function UserProfileDropdown() {
           <span>Profile</span>
         </DropdownMenuItem>
         <Link href="/add-events">
-        <DropdownMenuItem>
-          <Calendar className="mr-2 h-4 w-4" />
-          <span>Add Events</span>
-        </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Calendar className="mr-2 h-4 w-4" />
+            <span>Add Events</span>
+          </DropdownMenuItem>
         </Link>
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
+        <Link href="/admin">
+          <DropdownMenuItem>
+            <User2Icon className="mr-2 h-4 w-4" />
+            <span>Admin</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Help & Support</span>
