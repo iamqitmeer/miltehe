@@ -12,6 +12,8 @@ export async function GET(request) {
     message: "Categories Fetch Succesfully",
   });
 }
+
+
 export async function POST(request) {
   // Connect to the database cinnectDB
   await connectDB();
@@ -31,11 +33,11 @@ export async function POST(request) {
     console.log("Data DB me Add Ho Gaya ------>", addDataToDB);
 
     // Return success response
-    return new Response(
-      JSON.stringify({
+    return new Response.json(
+      {
         categories: addDataToDB,
         message: "Category added successfully",
-      }),
+      },
       {
         status: 201,
         headers: {
@@ -47,18 +49,15 @@ export async function POST(request) {
     console.error("Error adding category:", error);
 
     // Return error response
-    return new Response(
-      JSON.stringify({
+    return new Response.json(
+      {
         message: "Failed to add category",
         error: error.message,
-      }),
+      },
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        "Content-Type": "application/json",
       }
     );
   }
 }
-
