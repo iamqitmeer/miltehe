@@ -562,6 +562,7 @@ export default function AddEventPage() {
               onChange={(e) => setStartDate(e.target.value)}
               required
             />
+            
           </div>
           <div>
             <Label>End Date</Label>
