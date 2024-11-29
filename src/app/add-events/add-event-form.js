@@ -1,15 +1,26 @@
-// category-select.js
 "use client";
-import { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
+// CategorySelect Component
 export function CategorySelect({ control, watch }) {
   const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
+  const [allSubCategories, setAllSubCategories] = useState([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
 
-  // Fetch categories and subcategories data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -21,7 +32,7 @@ export function CategorySelect({ control, watch }) {
         const subCategoriesData = await subCategoriesResponse.json();
 
         setCategories(categoriesData.categories || []);
-        setSubCategories(subCategoriesData.subCategories || []);
+        setAllSubCategories(subCategoriesData.subCategories || []);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
@@ -30,11 +41,15 @@ export function CategorySelect({ control, watch }) {
     fetchData();
   }, []);
 
-  // Filter sub-categories based on the selected category
   const filterSubCategories = (categoryId) => {
-    const filtered = subCategories.filter(subCategory => subCategory.category._id === categoryId);
+    const filtered = allSubCategories.filter(
+      (subCategory) => subCategory.category._id === categoryId
+    );
     setFilteredSubCategories(filtered);
   };
+
+  // Ensure that watch is a function and properly used
+  const categoryValue = watch("category");
 
   return (
     <>
@@ -45,11 +60,11 @@ export function CategorySelect({ control, watch }) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              value={field.value}
               onValueChange={(value) => {
                 field.onChange(value);
                 filterSubCategories(value);
               }}
+              defaultValue={field.value}
             >
               <FormControl>
                 <SelectTrigger>
@@ -76,8 +91,9 @@ export function CategorySelect({ control, watch }) {
           <FormItem>
             <FormLabel>Sub-Category</FormLabel>
             <Select
-              value={field.value}
               onValueChange={field.onChange}
+              defaultValue={field.value}
+              disabled={!categoryValue}
             >
               <FormControl>
                 <SelectTrigger>

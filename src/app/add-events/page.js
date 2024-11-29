@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { CalendarIcon, Clock, MapPin, Users, User } from "lucide-react"
-import { format } from "date-fns"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { CalendarIcon, Clock, MapPin, Users, User } from "lucide-react";
+import { format } from "date-fns";
+import { CategorySelect } from './category-select'; // Ensure correct import
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -16,30 +17,29 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/hooks/use-toast"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Switch } from "@/components/ui/switch"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
-import { CategorySelect } from "./category-select"
-import { TagInput } from "./tag-input"
-import { ImageUpload } from "./image-upload"
+  SelectValue,
+} from "@/components/ui/select";
+import { TagInput } from "./tag-input";
+import { ImageUpload } from "./image-upload";
 
 // Form validation schema with zod
 const formSchema = z.object({
@@ -59,10 +59,10 @@ const formSchema = z.object({
     .max(100, "Location must be less than 100 characters"),
   isVirtual: z.boolean(),
   startDate: z.date({
-    required_error: "Start date is required"
+    required_error: "Start date is required",
   }),
   endDate: z.date({
-    required_error: "End date is required"
+    required_error: "End date is required",
   }),
   startTime: z.string().min(1, "Please select a start time"),
   endTime: z.string().min(1, "Please select an end time"),
@@ -78,22 +78,19 @@ const formSchema = z.object({
     .max(10, "You can add up to 10 tags"),
   image: z.string().optional(),
   isPaid: z.boolean(),
-  price: z
-    .number()
-    .min(0, "Price cannot be negative")
-    .optional(),
+  price: z.number().min(0, "Price cannot be negative").optional(),
   currency: z.enum(["USD", "EUR", "GBP"]),
   registrationDeadline: z.date().optional(),
   ageRestriction: z.enum(["All Ages", "18+", "21+"]),
   accessibility: z.array(z.string()),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "You must accept the terms and conditions"
-  })
-})
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and conditions",
+  }),
+});
 
 export default function AddEventPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -117,12 +114,12 @@ export default function AddEventPage() {
       currency: "USD",
       ageRestriction: "All Ages",
       accessibility: [],
-      termsAccepted: false
-    }
-  })
+      termsAccepted: false,
+    },
+  });
 
   async function onSubmit(values) {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch("/api/events", {
         method: "POST",
@@ -130,32 +127,35 @@ export default function AddEventPage() {
         body: JSON.stringify({
           ...values,
           startDateTime: new Date(
-            `${values.startDate.toISOString().split("T")[0]}T${values.startTime}`
+            `${values.startDate.toISOString().split("T")[0]}T${
+              values.startTime
+            }`
           ),
           endDateTime: new Date(
             `${values.endDate.toISOString().split("T")[0]}T${values.endTime}`
-          )
-        })
-      })
+          ),
+        }),
+      });
 
       if (response.ok) {
         toast({
           title: "Event created successfully!",
-          description: "You will be redirected to the events page."
-        })
-        router.push("/events")
+          description: "You will be redirected to the events page.",
+        });
+        router.push("/events");
       } else {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to create event.")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create event.");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "An error occurred while creating the event.",
-        variant: "destructive"
-      })
+        description:
+          error.message || "An error occurred while creating the event.",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -248,8 +248,9 @@ export default function AddEventPage() {
                       <FormControl>
                         <Button
                           variant={"outline"}
-                          className={`w-[240px] pl-3 text-left font-normal ${!field.value &&
-                            "text-muted-foreground"}`}
+                          className={`w-[240px] pl-3 text-left font-normal ${
+                            !field.value && "text-muted-foreground"
+                          }`}
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -265,7 +266,7 @@ export default function AddEventPage() {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={date =>
+                        disabled={(date) =>
                           date < new Date() || date < new Date("1900-01-01")
                         }
                         initialFocus
@@ -311,8 +312,9 @@ export default function AddEventPage() {
                       <FormControl>
                         <Button
                           variant={"outline"}
-                          className={`w-[240px] pl-3 text-left font-normal ${!field.value &&
-                            "text-muted-foreground"}`}
+                          className={`w-[240px] pl-3 text-left font-normal ${
+                            !field.value && "text-muted-foreground"
+                          }`}
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -328,7 +330,7 @@ export default function AddEventPage() {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={date =>
+                        disabled={(date) =>
                           date < new Date() || date < new Date("1900-01-01")
                         }
                         initialFocus
@@ -502,8 +504,9 @@ export default function AddEventPage() {
                     <FormControl>
                       <Button
                         variant={"outline"}
-                        className={`w-[240px] pl-3 text-left font-normal ${!field.value &&
-                          "text-muted-foreground"}`}
+                        className={`w-[240px] pl-3 text-left font-normal ${
+                          !field.value && "text-muted-foreground"
+                        }`}
                       >
                         {field.value ? (
                           format(field.value, "PPP")
@@ -519,7 +522,7 @@ export default function AddEventPage() {
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={date =>
+                      disabled={(date) =>
                         date < new Date() || date < new Date("1900-01-01")
                       }
                       initialFocus
@@ -575,11 +578,11 @@ export default function AddEventPage() {
                   <div className="flex flex-wrap gap-4">
                     <Checkbox
                       checked={field.value.includes("wheelchair")}
-                      onCheckedChange={checked =>
+                      onCheckedChange={(checked) =>
                         field.onChange(
                           checked
                             ? [...field.value, "wheelchair"]
-                            : field.value.filter(val => val !== "wheelchair")
+                            : field.value.filter((val) => val !== "wheelchair")
                         )
                       }
                     >
@@ -587,11 +590,13 @@ export default function AddEventPage() {
                     </Checkbox>
                     <Checkbox
                       checked={field.value.includes("signLanguage")}
-                      onCheckedChange={checked =>
+                      onCheckedChange={(checked) =>
                         field.onChange(
                           checked
                             ? [...field.value, "signLanguage"]
-                            : field.value.filter(val => val !== "signLanguage")
+                            : field.value.filter(
+                                (val) => val !== "signLanguage"
+                              )
                         )
                       }
                     >
@@ -599,11 +604,13 @@ export default function AddEventPage() {
                     </Checkbox>
                     <Checkbox
                       checked={field.value.includes("hearingAssistance")}
-                      onCheckedChange={checked =>
+                      onCheckedChange={(checked) =>
                         field.onChange(
                           checked
                             ? [...field.value, "hearingAssistance"]
-                            : field.value.filter(val => val !== "hearingAssistance")
+                            : field.value.filter(
+                                (val) => val !== "hearingAssistance"
+                              )
                         )
                       }
                     >
@@ -650,5 +657,5 @@ export default function AddEventPage() {
         </form>
       </Form>
     </div>
-  )
+  );
 }
